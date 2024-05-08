@@ -1,29 +1,43 @@
 from webob import Request, Response
 
 
-class PineAppleFrame:
+class PineApple:
 
-    # def __call__(self, environ, start_response):
-    #     status = "200 OK"
-    #     headers = [("Content-Type", "text/plain")]
-    #
-    #     start_response(status, headers)
-    #     return [b"Hello World"]
+    def __init__(self):
+        self._routes = dict()
 
-    # https://docs.pylonsproject.org/projects/webob/en/stable/reference.html#request
     def __call__(self, environ, start_response):
         request = Request(environ=environ)
-
-        # response = Response()
-        # response.text = "'Hello World' from pineapple web framework !!!"
-
         response = self.handle_request(request=request)
         return response(environ=environ, start_response=start_response)
 
-    @staticmethod
-    def handle_request(request):
-        user_agent = request.environ.get('HTTP_USER_AGENT', "User Agent not Found")
+    def route(self, path):
+        def wrapper(handler):
+            self._routes[path] = handler
+            return handler
 
+        return wrapper
+
+    def find_handler(self, request):
+
+        for path, handler in self._routes.items():
+            if path == request.path:
+                return handler
+
+        return None
+
+    def handle_request(self, request):
         response = Response()
-        response.text = f"Hello World with user agent: {user_agent}"
+
+        handler = self.find_handler(request)
+        handler(request, response) if handler else self.default_response(response)
         return response
+
+    @staticmethod
+    def default_response(response):
+        response.status_code = 404
+        response.text = "404 Page not Found"
+
+
+class PineAppleFrame(PineApple):
+    pass
