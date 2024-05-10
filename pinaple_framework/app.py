@@ -1,5 +1,7 @@
 from webob import Request, Response
 
+from parse import parse
+
 
 class PineApple:
 
@@ -21,16 +23,18 @@ class PineApple:
     def find_handler(self, request):
 
         for path, handler in self._routes.items():
-            if path == request.path:
-                return handler
 
-        return None
+            parsed_result = parse(format=path, string=request.path)
+            if parsed_result:
+                return handler, parsed_result.named
+
+        return None, None
 
     def handle_request(self, request):
         response = Response()
 
-        handler = self.find_handler(request)
-        handler(request, response) if handler else self.default_response(response)
+        handler, kwargs = self.find_handler(request)
+        handler(request, response, **kwargs) if handler else self.default_response(response)
         return response
 
     @staticmethod
