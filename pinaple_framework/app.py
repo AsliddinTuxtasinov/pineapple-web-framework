@@ -1,5 +1,7 @@
 import inspect
 
+import requests
+import wsgiadapter
 from webob import Request, Response
 
 from parse import parse
@@ -60,4 +62,7 @@ class PineApple:
 
 
 class PineAppleFrame(PineApple):
-    pass
+    def test_session(self):
+        session = requests.Session()
+        session.mount('http://testserver', wsgiadapter.WSGIAdapter(self))
+        return session

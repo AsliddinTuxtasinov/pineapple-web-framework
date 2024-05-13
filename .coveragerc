@@ -1,0 +1,2 @@
+[run]
+omit = venv/*,main.py,pinaple_framework/conftest.py,pinaple_framework/test_app.py
