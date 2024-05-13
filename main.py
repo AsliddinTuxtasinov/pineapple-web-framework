@@ -16,3 +16,13 @@ def about(request, response):
 @app.route(path="/hello/{name}")
 def greeting(request, response, name):
     response.text = f"Hello, {name}!"
+
+
+@app.route(path="/books")
+class Book:
+
+    def get(self, request, response):
+        response.text = "Hello from book page"
+
+    def post(self, request, response):
+        response.text = "Book created endpoint successfully work."
